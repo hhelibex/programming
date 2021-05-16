@@ -1,0 +1,9 @@
+#! /bin/bash
+
+if [ ! -f etc/config.txt ]; then
+	mkdir -p etc
+	echo _time_limit=10 >> etc/config.txt
+	echo _memory_limit='$((256*1024))' >> etc/config.txt
+	echo >> etc/config.txt
+	echo _show_details=1 >> etc/config.txt
+fi

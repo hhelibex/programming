@@ -1,0 +1,13 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.sh
+fi
+
+if [ ! -v bin_path ]; then
+	bin_path=bash
+fi
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base

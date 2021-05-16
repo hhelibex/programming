@@ -1,0 +1,25 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.go
+fi
+
+if [ ! -v bin_path ]; then
+	bin_path=go
+fi
+
+function _compile() {
+	local dataDir=$(pwd)
+	cd ${_src_dir}
+	GOPATH=${dataDir} ${bin_path} build ${src}
+	s=$?
+	cd ${dataDir}
+	return ${s}
+}
+
+_src_dir=$(dirname ${src})
+src=$(basename ${src})
+_cmd="./$(basename ${src} .go)"
+
+. $(dirname $0)/run-all.base

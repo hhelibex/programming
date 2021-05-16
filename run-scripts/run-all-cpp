@@ -1,0 +1,19 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.cpp
+fi
+
+function _compile() {
+	local boost_inclue=/opt/boost/gcc/include
+	local boost_lib=/opt/boost/gcc/lib
+	if [ "$(dirname ${src})" != "." ]; then
+		g++ -std=gnu++1y -O2 -I${boost_include} -L${boost_lib} -o a.out $(find $(dirname ${src}) -name '*.cpp') ${L}
+	else
+		g++ -std=gnu++1y -O2 -I${boost_include} -L${boost_lib} -o a.out ${src} ${L}
+	fi
+}
+_cmd="./a.out"
+
+. $(dirname $0)/run-all.base

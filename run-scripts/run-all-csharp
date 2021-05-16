@@ -1,0 +1,17 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.cs
+fi
+
+function _compile() {
+	if [ "$(dirname ${src})" != "." ]; then
+		mcs -out:$(basename ${src} .cs).exe $(find $(dirname ${src}) -name '*.cs')
+	else
+		mcs -out:$(basename ${src} .cs).exe ${src}
+	fi
+}
+_cmd="mono $(basename ${src} .cs).exe"
+
+. $(dirname $0)/run-all.base

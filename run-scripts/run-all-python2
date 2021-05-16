@@ -1,0 +1,14 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.py2
+fi
+
+if [ ! -v bin_path ]; then
+#	bin_path=~/bin/Python-2.7.15/bin/python2
+	bin_path=python2
+fi
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base

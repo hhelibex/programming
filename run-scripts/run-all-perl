@@ -1,0 +1,15 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.pl
+fi
+
+if [ ! -v bin_path ]; then
+	bin_path=perl
+fi
+_src_dir=$(dirname ${src})
+src=$(basename ${src})
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base

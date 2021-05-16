@@ -1,0 +1,130 @@
+#! /bin/bash
+
+function _clean_up() {
+	rm -f ${stdout} ${stderr} ${filter_out} ${filter_err}
+}
+function _check_time_limit() {
+	timeout ${_time_limit} true >> /dev/null 2>&1
+}
+function _check_memory_limit() {
+	( echo $((_memory_limit+0)) ) >>/dev/null 2>&1
+}
+function _prepare_output_filter() {
+	if [ -f output_filter.cpp ]; then
+		g++ -std=gnu++1y -O2 -o output_filter output_filter.cpp
+	fi
+}
+function _output_filter() {
+	local inp=$1
+	local out=$2
+	local ans=$3
+
+	if [ -x output_filter ]; then
+		./output_filter ${inp} ${out} ${ans}
+	else
+		diff ${out} ${ans}
+	fi
+}
+
+trap _clean_up INT
+trap _clean_up KILL
+
+if [ -f etc/config.txt ]; then
+	. etc/config.txt
+fi
+
+if [ ! -v _time_limit ]; then
+	_time_limit=120
+elif ! _check_time_limit ; then
+	echo "${_time_limit}: Invalid time limit value." >> /dev/stderr
+	exit 1
+fi
+if [ ! -v _memory_limit ]; then
+	_memory_limit=$((4096*1024))
+elif ! _check_memory_limit ; then
+	echo "${_memory_limit}: Invalid memory limit value." >> /dev/stderr
+	exit 1
+fi
+if [ ! -v _bin_dir ]; then
+	_bin_dir=.
+fi
+_data_dir=$(pwd)
+if [ -v _src_dir ]; then
+	cd ${_src_dir}
+fi
+
+function _ie() {
+	echo "IE"
+	exit 1
+}
+function _ce() {
+	echo "CE"
+	exit 1
+}
+
+if [ "$(type -t _compile)" == "function" ]; then
+	_compile || _ce
+fi
+_prepare_output_filter || _ie
+
+if [ ! -v _cmd ]; then
+	if [ "$(type -t _cmd_string)" == "function" ]; then
+		_cmd=$(_cmd_string)
+	else
+		echo "IE"
+		exit 1
+	fi
+fi
+
+
+stdout=stdout.$$.txt
+stderr=stderr.$$.txt
+filter_out=filter_out.$$.txt
+filter_err=filter_err.$$.txt
+
+ac=0
+wa=0
+tle=0
+re=0
+mle=0
+
+for f in ${_data_dir}/in/*.txt ; do
+	printf "%-20s: " $(echo ${f} | sed -e "s|${_data_dir}/||")
+	ff=${f/\/in\//\/out\/}
+	cat ${f} | /usr/bin/time -f "%M %e" timeout --signal=KILL ${_time_limit} ${_cmd} 2>${stderr} 1>${stdout}
+	status=(${PIPESTATUS[@]})
+	_output_filter ${f} ${stdout} ${ff} 2>${filter_err} 1>${filter_out}
+	status=(${status[@]} $?)
+	m=$(cat ${stderr} | tail -1 | awk '{print $1;}')
+	t=$(cat ${stderr} | tail -1 | awk '{print $2;}')
+	if [ ${status[1]} -eq 9 ]; then
+		s=TLE
+		tle=$((tle+1))
+	elif [ ${status[1]} -ne 0 ]; then
+		s=RE
+		re=$((re+1))
+	elif [ ${m} -gt ${_memory_limit} ]; then
+		s=MLE
+		mle=$((mle+1))
+	elif [ ${status[2]} -ne 0 ]; then
+		s=WA
+		wa=$((wa+1))
+	else
+		s=AC
+		ac=$((ac+1))
+	fi
+	printf "%-3s (%7dKB / %7.2lfsec)\n" ${s} ${m} ${t}
+
+	if [ -v _show_details ] && [ ${_show_details} -gt 0 ]; then
+		(
+			cat ${stderr} | head -$(($(cat ${stderr} | wc -l)-1))
+			cat ${filter_out}
+			cat ${filter_err}
+		) | sed -e 's/^/        /'
+	fi
+done
+
+printf "========\n"
+printf "AC=%3d  WA=%3d  RE=%3d  TLE=%3d MLE=%3d\n" ${ac} ${wa} ${re} ${tle} ${mle}
+
+_clean_up

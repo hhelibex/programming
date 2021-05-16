@@ -1,0 +1,14 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.php
+fi
+
+if [ ! -v bin_path ]; then
+#	bin_path=~/bin/php-7.2.11
+	bin_path=php
+fi
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base

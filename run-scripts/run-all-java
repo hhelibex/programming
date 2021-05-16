@@ -1,0 +1,19 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.java
+fi
+
+function _compile() {
+	if [ "$(dirname ${src})" != "." ]; then
+		javac -Xlint:unchecked -d ${_bin_dir} $(find $(dirname ${src}) -name '*.java')
+	else
+		javac -Xlint:unchecked -d ${_bin_dir} ${src}
+	fi
+}
+function _cmd_string() {
+	echo -n "java -cp ${_bin_dir} -Xms1536m -Xmx1536m Main"
+}
+
+. $(dirname $0)/run-all.base

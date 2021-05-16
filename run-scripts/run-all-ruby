@@ -1,0 +1,14 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.rb
+fi
+
+if [ ! -v bin_path ]; then
+#	bin_path=~/bin/ruby-2.5.1/bin/ruby
+	bin_path=ruby
+fi
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base

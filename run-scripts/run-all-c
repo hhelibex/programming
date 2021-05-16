@@ -1,0 +1,17 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.c
+fi
+
+function _compile() {
+	if [ "$(dirname ${src})" != "." ]; then
+		gcc -std=gnu11 -O2 -o a.out $(find $(dirname ${src}) -name '*.c') -lm ${L}
+	else
+		gcc -std=gnu11 -O2 -o a.out ${src} -lm ${L}
+	fi
+}
+_cmd="./a.out"
+
+. $(dirname $0)/run-all.base

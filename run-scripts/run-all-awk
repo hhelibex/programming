@@ -1,0 +1,13 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.awk
+fi
+
+if [ ! -v bin_path ]; then
+	bin_path=awk
+fi
+_cmd="${bin_path} -f ${src}"
+
+. $(dirname $0)/run-all.base

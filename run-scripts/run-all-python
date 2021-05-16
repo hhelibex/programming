@@ -1,0 +1,13 @@
+#! /bin/bash
+
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=Main.py
+fi
+
+if [ ! -v bin_path ]; then
+	bin_path=~/bin/Python-3.6.4/bin/python3
+fi
+_cmd="${bin_path} ${src}"
+
+. $(dirname $0)/run-all.base
