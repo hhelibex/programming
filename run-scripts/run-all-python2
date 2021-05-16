@@ -2,7 +2,7 @@
 
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main.py2
+	src=Main2.py
 fi
 
 if [ ! -v bin_path ]; then
