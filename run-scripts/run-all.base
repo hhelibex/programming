@@ -89,6 +89,7 @@ re=0
 mle=0
 
 for f in ${_data_dir}/in/*.txt ; do
+	terminated=0
 	printf "%-20s: " $(echo ${f} | sed -e "s|${_data_dir}/||")
 	ff=${f/\/in\//\/out\/}
 	cat ${f} | /usr/bin/time -f "%M %e" timeout --signal=KILL ${_time_limit} ${_cmd} 2>${stderr} 1>${stdout}
@@ -100,12 +101,15 @@ for f in ${_data_dir}/in/*.txt ; do
 	if [ ${status[1]} -eq 9 ]; then
 		s=TLE
 		tle=$((tle+1))
+		terminated=1
 	elif [ ${status[1]} -ne 0 ]; then
 		s=RE
 		re=$((re+1))
+		terminated=1
 	elif [ ${m} -gt ${_memory_limit} ]; then
 		s=MLE
 		mle=$((mle+1))
+		terminated=1
 	elif [ ${status[2]} -ne 0 ]; then
 		s=WA
 		wa=$((wa+1))
@@ -115,7 +119,7 @@ for f in ${_data_dir}/in/*.txt ; do
 	fi
 	printf "%-3s (%7dKB / %7.2lfsec)\n" ${s} ${m} ${t}
 
-	if [ -v _show_details ] && [ ${_show_details} -gt 0 ]; then
+	if [ ${terminated} -eq 0 ] && [ -v _show_details ] && [ ${_show_details} -gt 0 ]; then
 		(
 			cat ${stderr} | head -$(($(cat ${stderr} | wc -l)-1))
 			cat ${filter_out}
