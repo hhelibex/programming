@@ -7,3 +7,10 @@ if [ ! -f etc/config.txt ]; then
 	echo >> etc/config.txt
 	echo _show_details=1 >> etc/config.txt
 fi
+for p in ${@}; do
+	if [ -x $(dirname $0)/run-all-${p} ]; then
+		$(dirname $0)/run-all-${p} -i
+	else
+		echo "${p}: Unsupported language" 1>&2
+	fi
+done

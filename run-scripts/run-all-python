@@ -1,10 +1,22 @@
 #! /bin/bash
 
+. $(dirname $0)/run-all.include
+
+default_src=Main3.py
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main3.py
+	src=${default_src}
 fi
 
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+__EOF__
+	return 0
+}
 if [ ! -v bin_path ]; then
 	bin_path=~/bin/Python-3.6.4/bin/python3
 fi

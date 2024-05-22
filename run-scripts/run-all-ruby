@@ -1,10 +1,22 @@
 #! /bin/bash
 
+. $(dirname $0)/run-all.include
+
+default_src=Main.rb
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main.rb
+	src=${default_src}
 fi
 
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+__EOF__
+	return 0
+}
 if [ ! -v bin_path ]; then
 #	bin_path=~/bin/ruby-2.5.1/bin/ruby
 	bin_path=ruby

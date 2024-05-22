@@ -1,0 +1,11 @@
+#! /bin/bash
+
+_init=0
+while getopts i op; do
+	case ${op} in
+		i)
+			_init=1
+		;;
+	esac
+done
+shift $((OPTIND - 1))

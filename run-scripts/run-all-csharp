@@ -1,10 +1,28 @@
 #! /bin/bash
 
+. $(dirname $0)/run-all.include
+
+default_src=Main.cs
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main.cs
+	src=${default_src}
 fi
 
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+using System;
+
+public class Dummy {
+        public static void Main(string[] args) {
+	}
+}
+__EOF__
+	return 0
+}
 function _compile() {
 	if [ "$(dirname ${src})" != "." ]; then
 		mcs -out:$(basename ${src} .cs).exe $(find $(dirname ${src}) -name '*.cs')

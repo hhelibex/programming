@@ -1,10 +1,27 @@
 #! /bin/bash
 
+. $(dirname $0)/run-all.include
+
+default_src=Main.cpp
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main.cpp
+	src=${default_src}
 fi
 
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+#include <iostream>
+
+int main(int argc, char** argv) {
+	return EXIT_SUCCESS;
+}
+__EOF__
+	return 0
+}
 function _compile() {
 	local boost_inclue=/opt/boost/gcc/include
 	local boost_lib=/opt/boost/gcc/lib

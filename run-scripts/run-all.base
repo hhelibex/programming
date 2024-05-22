@@ -26,6 +26,19 @@ function _output_filter() {
 	fi
 }
 
+if [ -v _init ] && [ ${_init} -eq 1 ]; then
+	if [ "$(type -t _init_src)" == "function" ]; then
+		if ! _init_src; then
+			echo "IE"
+			exit 1
+		fi
+	else
+		echo "IE"
+		exit 1
+	fi
+	exit 0
+fi
+
 trap _clean_up INT
 trap _clean_up KILL
 

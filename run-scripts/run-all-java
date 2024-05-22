@@ -1,10 +1,29 @@
 #! /bin/bash
 
+. $(dirname $0)/run-all.include
+
+default_src=Main.java
 src=$1
 if [ -z ${src} ] || [ ! -f ${src} ]; then
-	src=Main.java
+	src=${default_src}
 fi
 
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+	}
+}
+__EOF__
+	return 0
+}
 function _compile() {
 	if [ "$(dirname ${src})" != "." ]; then
 		javac -Xlint:unchecked -d ${_bin_dir} $(find $(dirname ${src}) -name '*.java')
@@ -13,7 +32,7 @@ function _compile() {
 	fi
 }
 function _cmd_string() {
-	echo -n "java -cp ${_bin_dir} -Xms1536m -Xmx1536m Main"
+	echo -n "java -cp ${_bin_dir} -Xms1536m -Xmx1536m "$(basename ${src} .java)
 }
 
 . $(dirname $0)/run-all.base
