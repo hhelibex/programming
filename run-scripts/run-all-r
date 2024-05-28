@@ -1,0 +1,25 @@
+#! /bin/bash
+
+. $(dirname $0)/run-all.include
+
+default_src=Main.r
+src=$1
+if [ -z ${src} ] || [ ! -f ${src} ]; then
+	src=${default_src}
+fi
+
+function _init_src() {
+	if [ -f ${default_src} ]; then
+		echo "${default_src}: File already exists."
+		return 1
+	fi
+	cat <<__EOF__ > ${default_src}
+__EOF__
+	return 0
+}
+if [ ! -v bin_path ]; then
+	bin_path=R
+fi
+_cmd="${bin_path} -q --slave -f ${src}"
+
+. $(dirname $0)/run-all.base
